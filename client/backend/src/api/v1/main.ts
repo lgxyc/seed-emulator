@@ -1,10 +1,11 @@
 import express from 'express';
 import { SocketHandler } from '../../utils/socket-handler';
-import dockerode from 'dockerode';
+import dockerode, { Container } from 'dockerode';
 import { SeedContainerInfo, Emulator, SeedNetInfo } from '../../utils/seedemu-meta';
 import { Sniffer } from '../../utils/sniffer';
 import WebSocket from 'ws';
 import { Controller } from '../../utils/controller';
+import { memoryUsage } from 'process';
 
 const router = express.Router();
 const docker = new dockerode();
@@ -12,23 +13,35 @@ const socketHandler = new SocketHandler(docker);
 const sniffer = new Sniffer(docker);
 const controller = new Controller(docker);
 
-const getContainers: () => Promise<SeedContainerInfo[]> = async function() {
+
+const getContainers: () => Promise<SeedContainerInfo[]> = async function () {
     var containers: dockerode.ContainerInfo[] = await docker.listContainers();
 
-    var _containers: SeedContainerInfo[] = containers.map(c => {
+    var _containers: SeedContainerInfo[] = await Promise.all(containers.map(async c => {
         var withMeta = c as SeedContainerInfo;
-
+        var container = docker.getContainer(c.Id);
+        const chunk = await new Promise<any>((resolve, reject) => {
+            container.stats({ stream: false }, (err, chunk) => {
+                if (err) reject(err);
+                else resolve(chunk);
+            });
+        });
+        var memoryUsage = chunk.memory_stats.usage?chunk.memory_stats.usage:0;
+        var memoryLimit = chunk.memory_stats.limit?chunk.memory_stats.limit:0;
+        var memoryMax = chunk.memory_stats.max_usage?chunk.memory_stats.max_usage:0;
+        
         withMeta.meta = {
             hasSession: socketHandler.getSessionManager().hasSession(c.Id),
-            emulatorInfo: Emulator.ParseNodeMeta(c.Labels)
+            emulatorInfo: Emulator.ParseNodeMeta(c.Labels),
+            memoryInfo: [memoryUsage, memoryMax,memoryLimit, ]
         };
-
+        // console.log(withMeta.meta.memoryInfo);
         return withMeta;
-    });
+    }));
 
     // filter out undefine (not our nodes)
     return _containers.filter(c => c.meta.emulatorInfo.name);;
-} 
+}
 
 socketHandler.getLoggers().forEach(logger => logger.setSettings({
     minLevel: 'warn'
@@ -42,7 +55,7 @@ controller.getLoggers().forEach(logger => logger.setSettings({
     minLevel: 'warn'
 }));
 
-router.get('/network', async function(req, res, next) {
+router.get('/network', async function (req, res, next) {
     var networks = await docker.listNetworks();
 
     var _networks: SeedNetInfo[] = networks.map(n => {
@@ -54,7 +67,7 @@ router.get('/network', async function(req, res, next) {
 
         return withMeta;
     });
-    
+
     _networks = _networks.filter(n => n.meta.emulatorInfo.name);
 
     res.json({
@@ -65,7 +78,7 @@ router.get('/network', async function(req, res, next) {
     next();
 });
 
-router.get('/container', async function(req, res, next) {
+router.get('/container', async function (req, res, next) {
     try {
         let containers = await getContainers();
 
@@ -83,7 +96,7 @@ router.get('/container', async function(req, res, next) {
     next();
 });
 
-router.get('/container/:id', async function(req, res, next) {
+router.get('/container/:id', async function (req, res, next) {
     var id = req.params.id;
 
     var candidates = (await docker.listContainers())
@@ -108,7 +121,7 @@ router.get('/container/:id', async function(req, res, next) {
     next();
 });
 
-router.get('/container/:id/net', async function(req, res, next) {
+router.get('/container/:id/net', async function (req, res, next) {
     let id = req.params.id;
 
     var candidates = (await docker.listContainers())
@@ -133,7 +146,7 @@ router.get('/container/:id/net', async function(req, res, next) {
     next();
 });
 
-router.post('/container/:id/net', express.json(), async function(req, res, next) {
+router.post('/container/:id/net', express.json(), async function (req, res, next) {
     let id = req.params.id;
 
     var candidates = (await docker.listContainers())
@@ -147,11 +160,11 @@ router.post('/container/:id/net', express.json(), async function(req, res, next)
         next();
         return;
     }
-    
+
     let node = candidates[0];
 
     controller.setNetworkConnected(node.Id, req.body.status);
-    
+
     res.json({
         ok: true
     });
@@ -159,7 +172,7 @@ router.post('/container/:id/net', express.json(), async function(req, res, next)
     next();
 });
 
-router.ws('/console/:id', async function(ws, req, next) {
+router.ws('/console/:id', async function (ws, req, next) {
     try {
         await socketHandler.handleSession(ws, req.params.id);
     } catch (e) {
@@ -168,14 +181,14 @@ router.ws('/console/:id', async function(ws, req, next) {
             ws.close();
         }
     }
-    
+
     next();
 });
 
 var snifferSubscribers: WebSocket[] = [];
 var currentSnifferFilter: string = '';
 
-router.post('/sniff', express.json(), async function(req, res, next) {
+router.post('/sniff', express.json(), async function (req, res, next) {
     sniffer.setListener((nodeId, data) => {
         var deadSockets: WebSocket[] = [];
 
@@ -208,7 +221,7 @@ router.post('/sniff', express.json(), async function(req, res, next) {
     next();
 });
 
-router.get('/sniff', function(req, res, next) {
+router.get('/sniff', function (req, res, next) {
     res.json({
         ok: true,
         result: {
@@ -219,7 +232,7 @@ router.get('/sniff', function(req, res, next) {
     next();
 });
 
-router.ws('/sniff', async function(ws, req, next) {
+router.ws('/sniff', async function (ws, req, next) {
     snifferSubscribers.push(ws);
     next();
 });

@@ -200,15 +200,16 @@ export class IndexUi {
 
     private _createNodeRow(container: EmulatorNode) {
         var node = container.meta.emulatorInfo;
-
+        var memoryInfo  = container.meta.memoryInfo;
+        // console.log("接收到memoryInfo = ",memoryInfo);
         var tr = document.createElement('tr');
-
         var tds = document.createElement('td');
         var td0 = document.createElement('td');
         var td1 = document.createElement('td');
         var td2 = document.createElement('td');
         var td3 = document.createElement('td');
         var td4 = document.createElement('td');
+        var td5 = document.createElement('td');
 
         td0.className = 'text-monospace';
         td1.className = 'text-monospace';
@@ -217,6 +218,7 @@ export class IndexUi {
         td0.innerText = node.asn != 0 ? `AS${node.asn}` : 'N/A';
         td1.innerText = node.name;
         td2.innerText = node.role;
+        td4.innerText = memoryInfo[0] +'/' + memoryInfo[1] +'/'+ memoryInfo[2];
 
         node.nets.forEach(a => {
             var div = document.createElement('div');
@@ -242,19 +244,19 @@ export class IndexUi {
         var id = container.Id.substr(0, 12);
         var title = `${node.role}: AS${node.asn}/${node.name}`;
 
-        td4.appendChild(this._createBtn(
+        td5.appendChild(this._createBtn(
             'Attach',
             'btn btn-sm btn-primary mr-1 mb-1',
             () => console(id, title)
         ));
 
-        td4.appendChild(this._createBtn(
+        td5.appendChild(this._createBtn(
             'Kill…',
             'btn btn-sm btn-danger mr-1 mb-1',
             () => alert('Not implemented')
         ));
         
-        [tds, td0, td1, td2, td3, td4].forEach(td => tr.appendChild(td));
+        [tds, td0, td1, td2, td3, td4,td5].forEach(td => tr.appendChild(td));
 
         tr.id = id;
         tr.title = title;
@@ -295,7 +297,6 @@ export class IndexUi {
     private _load(url: string, table: DataTables.Api, handler: (data: any) => HTMLTableRowElement) {
         var xhr = new XMLHttpRequest();
         var createRow = handler.bind(this);
-
         table.clear();
 
         xhr.open('GET', url);
@@ -303,8 +304,9 @@ export class IndexUi {
             if (xhr.status == 200) {
                 var res = JSON.parse(xhr.responseText);
                 if (!res.ok) return;
-
+                // 对于每一个 Node 创建一行
                 res.result.forEach((c) => {
+                    // console.log("c = ", c);
                     table.row.add(createRow(c));
                 });
             }
@@ -313,9 +315,10 @@ export class IndexUi {
 
         xhr.send();
     }
-
+    // URL: /api/v1/container
     loadContainers(url: string) {
         this._containerUrl = url;
+
         this._load(url, this._containerTable, this._createNodeRow);
     }
 

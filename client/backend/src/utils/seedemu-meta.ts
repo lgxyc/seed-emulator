@@ -28,6 +28,7 @@ export interface SeedEmulatorNet extends VertexMeta {
 export interface SeedEmulatorMetadata {
     hasSession: boolean;
     emulatorInfo: SeedEmulatorNode;
+    memoryInfo: [string,string,string]
 }
 
 export interface SeedContainerInfo extends Dockerode.ContainerInfo {

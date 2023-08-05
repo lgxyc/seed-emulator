@@ -21,6 +21,7 @@ export interface EmulatorNode {
             description?: string,
             displayname?: string
         };
+        memoryInfo:[string,string,string]
     };
 };
 

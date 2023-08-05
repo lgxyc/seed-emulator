@@ -2,11 +2,13 @@
   "name": "container-manager-server",
   "version": "0.0.1",
   "description": "container manager server",
-  "main": "src/main.js",
+  "main": "bin/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tcs -w",
+	  "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "nat <nat@nat.moe>",
+
   "license": "MIT",
   "dependencies": {
     "@types/dockerode": "^3.2.2",
@@ -18,6 +20,10 @@
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "tslog": "^3.0.5",
+    "typescript": "^5.1.6",
     "ws": "^7.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
