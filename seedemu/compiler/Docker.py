@@ -320,7 +320,7 @@ class Docker(Compiler):
         internetMapEnabled: bool = False,
         internetMapPort: int = 8080,
         etherViewEnabled: bool = False,
-        etherViewPort: int = 5000,
+        etherViewPort: int = 5001,
         clientHideServiceNet: bool = True
     ):
         """!
@@ -891,7 +891,7 @@ class Docker(Compiler):
 
         #included in the seedemu-base dockerImage.
         #dockerfile += 'RUN curl -L https://grml.org/zsh/zshrc > /root/.zshrc\n'
-        dockerfile = 'FROM {}\n'.format(md5(image.getName().encode('utf-8')).hexdigest()) + dockerfile
+        dockerfile = 'FROM {}:latest\n'.format(md5(image.getName().encode('utf-8')).hexdigest()) + dockerfile
         self._used_images.add(image.getName())
 
         for cmd in node.getBuildCommands(): dockerfile += 'RUN {}\n'.format(cmd)
