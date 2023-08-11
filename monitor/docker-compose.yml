@@ -14,21 +14,24 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.2
     container_name: cadvisor
+    privileged: true 
     ports:
     - 8080:8080
     volumes:
-    - /:/rootfs:ro
-    - /var/run:/var/run:rw
-    - /sys:/sys:ro
-    - /var/lib/docker/:/var/lib/docker:ro
-    - /dev/disk/:/dev/disk:ro \
-    - /etc/machine-id:/etc/machine-id:ro
-    - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:r
-    devices:
-    - "/dev/kmsg"
-    privileged: true
+      - /var/run:/var/run:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /sys:/sys:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
+      # - /cgroup/cpu:/cgroup/cpu
+      # - /cgroup/cpuacct:/cgroup/cpuac./ct
+      # - /cgroup/cpuset:/cgroup/cpuset
+      # - /cgroup/memory:/cgroup/memory
+      # - /cgroup/blkio:/cgroup/blkio
   grafana:
-    image: grafana/grafana-oss
+    image: grafana/grafana-oss:latest
     container_name: grafana
     ports:
       - 3000:3000
