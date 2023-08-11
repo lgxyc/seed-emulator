@@ -19,24 +19,29 @@ const getContainers: () => Promise<SeedContainerInfo[]> = async function () {
 
     var _containers: SeedContainerInfo[] = await Promise.all(containers.map(async c => {
         var withMeta = c as SeedContainerInfo;
-        var container = docker.getContainer(c.Id);
-        const chunk = await new Promise<any>((resolve, reject) => {
-            container.stats({ stream: false }, (err, chunk) => {
-                if (err) reject(err);
-                else resolve(chunk);
-            });
-        });
+        
+        //暂时不获取内存使用情况
+        // var container = docker.getContainer(c.Id);
+        // const chunk = await new Promise<any>((resolve, reject) => {
+        //     container.stats({ stream: false }, (err, chunk) => {
+        //         if (err) reject(err);
+        //         else resolve(chunk);
+        //     });
+        // });
         // console.log(`memory usage = ${chunk.memory_stats.usage}, limit = ${chunk.memory_stats.limit},max_usage = ${chunk.memory_stats.max_usage}`);
         // console.log(chunk)
-        var memoryUsage = chunk.memory_stats.usage?chunk.memory_stats.usage:0;
-        var memoryLimit = chunk.memory_stats.limit?chunk.memory_stats.limit:0;
-        var memoryMax = chunk.memory_stats.max_usage?chunk.memory_stats.max_usage:0;
+        // var memoryUsage = chunk.memory_stats.usage?chunk.memory_stats.usage:0;
+        // var memoryLimit = chunk.memory_stats.limit?chunk.memory_stats.limit:0;
+        // var memoryMax = chunk.memory_stats.max_usage?chunk.memory_stats.max_usage:0;
         
         withMeta.meta = {
             hasSession: socketHandler.getSessionManager().hasSession(c.Id),
-            emulatorInfo: Emulator.ParseNodeMeta(c.Labels),
-            memoryInfo: [memoryUsage, memoryMax,memoryLimit, ]
+            emulatorInfo: Emulator.ParseNodeMeta(c.Labels),    
+            // memoryInfo: [memoryUsage, memoryMax,memoryLimit, ]
+            memoryInfo: ['0','0','0']
         };
+        
+
         // console.log(withMeta.meta.memoryInfo);
         return withMeta;
     }));
