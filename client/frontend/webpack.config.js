@@ -1,7 +1,7 @@
 const path = require('path');
 
 let config = {
-    mode: 'development',
+    mode: 'production',
     entry: {
         index: './src/index/index.ts',
         console: './src/console/console.ts',
@@ -30,7 +30,7 @@ let config = {
             }
             ,
             {
-                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/i,
                 use: [
                     {
                         loader: 'file-loader',
