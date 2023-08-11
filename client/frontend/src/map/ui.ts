@@ -6,6 +6,7 @@ import { EmulatorNetwork, EmulatorNode } from '../common/types';
 import { WindowManager } from '../common/window-manager';
 import { DataSource, Edge, Vertex } from './datasource';
 
+
 /**
  * map UI element bindings.
  */
@@ -757,6 +758,7 @@ export class MapUi {
                     let node = vertex.object as EmulatorNode;
                     itemDetails = node.meta.emulatorInfo.nets.map(net => net.address).join(', ');
                     itemName = `${node.meta.emulatorInfo.role}: ${itemName}`;
+                    vertex.image="../images/computer.png";
                 }
     
                 if (vertex.type == 'network') {
@@ -1316,7 +1318,8 @@ export class MapUi {
                 color: {
                     border: '#000',
                     background: this._randomColor()
-                }
+                },
+                size:30
             }
         });
 

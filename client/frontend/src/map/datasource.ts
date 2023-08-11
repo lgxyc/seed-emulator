@@ -1,5 +1,9 @@
 import { EdgeOptions, NodeOptions } from 'vis-network';
 import { BgpPeer, EmulatorNetwork, EmulatorNode } from '../common/types';
+import computerPng from './images/computer.png';
+import networkPng from './images/network.png';
+import routerPng from './images/router.png';
+import exchangePng from './images/exchange.png';
 
 export type DataEvent = 'packet' | 'dead';
 
@@ -84,7 +88,7 @@ export class DataSource {
                 }
 
                 var res = JSON.parse(xhr.response);
-                
+
                 if (res.ok) {
                     resolve(res);
                 } else {
@@ -215,7 +219,7 @@ export class DataSource {
      * @param callback callback.
      */
     on(eventName: DataEvent, callback?: (data: any) => void) {
-        switch(eventName) {
+        switch (eventName) {
             case 'packet':
                 this._packetEventHandler = callback;
                 break;
@@ -260,7 +264,10 @@ export class DataSource {
                 id: net.Id,
                 label: netInfo.displayname ?? `${netInfo.scope}/${netInfo.name}`,
                 type: 'network',
-                shape: netInfo.type == 'global' ? 'star' : 'diamond',
+                // shape: netInfo.type == 'global' ? 'star' : 'diamond',
+                shape: "image",
+                size:30,
+                image: netInfo.type == 'global' ? exchangePng:networkPng,
                 object: net
             };
 
@@ -277,7 +284,16 @@ export class DataSource {
                 id: node.Id,
                 label: nodeInfo.displayname ?? `${nodeInfo.asn}/${nodeInfo.name}`,
                 type: 'node',
-                shape: nodeInfo.role == 'Router' ? 'dot' : 'hexagon',
+                // shape: nodeInfo.role == 'Router' ? 'dot' : 'hexagon',
+                shape: nodeInfo.role == 'Router' ?"image":"circularImage",
+                image: nodeInfo.role == 'Router' ? routerPng : computerPng,
+                size:nodeInfo.role == 'Router' ? 30:40,
+                shapeProperties: nodeInfo.role == 'Router' ? {} : {
+                    useImageSize: false,
+                    useBorderWithImage: false,
+                    interpolation: false,
+                    coordinateOrigin: "center",
+                },
                 object: node
             };
 

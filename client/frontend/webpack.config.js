@@ -1,7 +1,8 @@
 const path = require('path');
 
 let config = {
-    mode: 'production',
+    mode: 'development',
+    // mode: 'production',
     entry: {
         index: './src/index/index.ts',
         console: './src/console/console.ts',
@@ -19,7 +20,6 @@ let config = {
             },
             {
                 test: /\.(jpg|png|gif)$/, 
-                include: path.resolve(__dirname, 'src'),
                 use: {
                     loader: 'file-loader',
                     options: {

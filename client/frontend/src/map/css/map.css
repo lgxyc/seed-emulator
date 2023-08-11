@@ -16,6 +16,7 @@ html, body, .map-area, .map {
     line-height: initial;
 }
 
+
 .clickable {
     cursor: pointer;
 }
