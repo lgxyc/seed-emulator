@@ -26,6 +26,8 @@ const getContainers: () => Promise<SeedContainerInfo[]> = async function () {
                 else resolve(chunk);
             });
         });
+        // console.log(`memory usage = ${chunk.memory_stats.usage}, limit = ${chunk.memory_stats.limit},max_usage = ${chunk.memory_stats.max_usage}`);
+        // console.log(chunk)
         var memoryUsage = chunk.memory_stats.usage?chunk.memory_stats.usage:0;
         var memoryLimit = chunk.memory_stats.limit?chunk.memory_stats.limit:0;
         var memoryMax = chunk.memory_stats.max_usage?chunk.memory_stats.max_usage:0;

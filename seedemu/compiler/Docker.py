@@ -320,7 +320,7 @@ class Docker(Compiler):
         internetMapEnabled: bool = False,
         internetMapPort: int = 8080,
         etherViewEnabled: bool = False,
-        etherViewPort: int = 5001,
+        etherViewPort: int = 5000,
         clientHideServiceNet: bool = True
     ):
         """!
