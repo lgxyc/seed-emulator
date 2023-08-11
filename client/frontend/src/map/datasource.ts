@@ -247,7 +247,7 @@ export class DataSource {
                 edges.push({
                     from: node.Id,
                     to: net.NetworkID,
-                    label
+                    // label
                 });
             })
         })
@@ -266,7 +266,7 @@ export class DataSource {
                 type: 'network',
                 // shape: netInfo.type == 'global' ? 'star' : 'diamond',
                 shape: "image",
-                size:30,
+                size:25,
                 image: netInfo.type == 'global' ? exchangePng:networkPng,
                 object: net
             };
