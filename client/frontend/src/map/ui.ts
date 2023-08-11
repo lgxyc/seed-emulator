@@ -755,9 +755,9 @@ export class MapUi {
     
                 if (vertex.type == 'node') {
                     let node = vertex.object as EmulatorNode;
-    
                     itemDetails = node.meta.emulatorInfo.nets.map(net => net.address).join(', ');
                     itemName = `${node.meta.emulatorInfo.role}: ${itemName}`;
+                    vertex.image="../images/computer.png"
                 }
     
                 if (vertex.type == 'network') {
@@ -780,7 +780,6 @@ export class MapUi {
     
                 item.appendChild(name);
                 item.appendChild(details);
-    
                 item.onclick = () => {
                     this._focusNode(vertex.id);
                     let set = new Set<string>();

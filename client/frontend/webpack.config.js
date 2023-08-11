@@ -1,10 +1,11 @@
 const path = require('path');
 
 let config = {
+    mode: 'development',
     entry: {
         index: './src/index/index.ts',
         console: './src/console/console.ts',
-        map: './src/map/map.ts'
+        map: './src/map/map.ts',
     },
     module: {
         rules: [
@@ -17,29 +18,30 @@ let config = {
                 use: ['ts-loader'],
             },
             {
+                test: /\.(jpg|png|gif)$/, 
+                include: path.resolve(__dirname, 'src'),
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: 'images/' 
+                    }
+                }
+            }
+            ,
+            {
                 test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
                 use: [
                     {
                         loader: 'file-loader',
                         options: {
                             name: '[name].[ext]',
-                            outputPath: 'fonts/'
+                            outputPath: 'fonts/',
                         }
                     }
                 ]
-            },
-            {
-                test: /\.(png|jpe?g|gif)$/i,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            name: 'images/[name].[ext]',
-                            outputPath: 'images/'
-                        },
-                    },
-                ],
             }
+
         ],
     },
     resolve: {
@@ -58,3 +60,4 @@ module.exports = (env, argv) => {
 
     return config;
 };
+
